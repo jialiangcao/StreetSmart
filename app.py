@@ -1,11 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from ultralytics import YOLO
 import cv2
 import numpy as np
 
-app = Flask(__name__)
+# ElevenLabs
+import os
+from elevenlabs.client import ElevenLabs
+from dotenv import load_dotenv
+import io
 
+load_dotenv()
+
+app = Flask(__name__)
 model = YOLO("best.pt")
+client = ElevenLabs(
+    api_key=os.getenv("ELEVENLABS_API_KEY")
+)
 
 @app.route("/", methods=['POST'])
 def predictTraffic():
@@ -40,6 +50,25 @@ def predictTraffic():
         predictions.append(prediction)
 
     return jsonify({"TrafficPrediction": predictions})
+
+# TTS DOES NOT WORK
+@app.route("/tts", methods=['POST'])
+def tts():
+    data = request.get_json()
+    text = data.get('text')
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    try:
+        audio = client.text_to_speech.convert(
+            text=text,
+            voice_id="JBFqnCBsd6RMkjVDRZzb",
+            model_id="eleven_multilingual_v2",
+            output_format="mp3_44100_128",
+        )
+        return Response(audio, mimetype="audio/mpeg")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # == Example Run ==
 #   "TrafficPrediction": [
