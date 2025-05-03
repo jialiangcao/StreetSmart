@@ -1,5 +1,6 @@
 // Replace this with actual deployment later
 let url = 'http://localhost:5000/'
+// *** Might have to mess with CORS here or in app.py
 
 export async function predictTraffic(imageFile) {
     const formData = new FormData()
@@ -17,9 +18,32 @@ export async function predictTraffic(imageFile) {
         }
 
         const result = await response.json()
-        return result.TrafficPrediction
+        return result.trafficPrediction
     } catch (error) {
         console.error('Traffic prediction error', error)
+        throw error;
+    }
+}
+
+export async function predictCar(imageFile) {
+    const formData = new FormData()
+    formData.append('image', imageFile)
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Car Prediction failed')
+        }
+
+        const result = await response.json()
+        return result.carPrediction
+    } catch (error) {
+        console.error('Car prediction error', error)
         throw error;
     }
 }

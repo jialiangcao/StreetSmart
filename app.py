@@ -2,22 +2,21 @@ from flask import Flask, request, jsonify, Response
 from ultralytics import YOLO
 import cv2
 import numpy as np
-
 # ElevenLabs
 import os
 from elevenlabs.client import ElevenLabs
 from dotenv import load_dotenv
-import io
-
-load_dotenv()
 
 app = Flask(__name__)
-model = YOLO("best.pt")
+trafficModel = YOLO("best.pt")
+carModel = YOLO("car-detection.pt")
+
+load_dotenv()
 client = ElevenLabs(
     api_key=os.getenv("ELEVENLABS_API_KEY")
 )
 
-@app.route("/", methods=['POST'])
+@app.route("/traffic", methods=['POST'])
 def predictTraffic():
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
@@ -33,7 +32,7 @@ def predictTraffic():
         return jsonify({"error": "Could not decode image"}), 400
 
     # Run inference
-    results = model(img)[0]
+    results = trafficModel(img)[0]
 
     # Define vars
     class_names = results.names
@@ -49,9 +48,42 @@ def predictTraffic():
         }
         predictions.append(prediction)
 
-    return jsonify({"TrafficPrediction": predictions})
+    return jsonify({"trafficPrediction": predictions})
 
-# TTS DOES NOT WORK
+@app.route("/car", methods=['POST'])
+def predictCar():
+    if 'image' not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"error": "Empty filename"}), 400
+
+    # Read image data into OpenCV format
+    file_bytes = np.frombuffer(file.read(), np.uint8)
+    img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+    if img is None:
+        return jsonify({"error": "Could not decode image"}), 400
+
+    # Run inference
+    results = carModel(img)[0]
+    class_names = results.names
+    predictions = []
+
+    for box in results.boxes:
+        cls_id = int(box.cls[0])
+        prediction = {
+                "class_id": cls_id,
+                "class_name": class_names.get(cls_id, "unknown"),
+                "confidence": float(box.conf[0]),
+                "bbox": [float(coord) for coord in box.xyxy[0]]
+        }
+        predictions.append(prediction)
+
+    print(predictions)
+    return jsonify({"carPrediction": predictions})
+
+# TTS is not tested
 @app.route("/tts", methods=['POST'])
 def tts():
     data = request.get_json()
