@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
+import { textToSpeech } from "../api/api";
 
 const libraries = ["places"];
 
@@ -25,6 +26,8 @@ const MapComponent = () => {
   const timeoutRef = useRef(null);
 
   const [currentPosition, setCurrentPosition] = useState(null);
+  const [currentInstruction, setCurrentInstruction] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(null);
 
   // Get and watch user's location
   useEffect(() => {
@@ -32,7 +35,7 @@ const MapComponent = () => {
       (position) => {
         const { latitude, longitude } = position.coords;
         const newPosition = { lat: latitude, lng: longitude };
-        const timestamp = new Date(position.timestamp).toLocaleString(); 
+        const timestamp = new Date(position.timestamp).toLocaleString();
         console.log("Current Position:", newPosition, "at", timestamp);
         setCurrentPosition(newPosition);
       },
@@ -68,9 +71,24 @@ const MapComponent = () => {
         destination,
         travelMode: window.google.maps.TravelMode.WALKING,
       },
-      (result, status) => {
+      async (result, status) => {
         if (status === "OK") {
           directionsRendererRef.current.setDirections(result);
+
+          const steps = result.routes[0].legs[0].steps;
+          if (steps.length > 0) {
+            const instruction = steps[0].instructions.replace(/<[^>]+>/g, "");
+            console.log("Speaking Instruction:", instruction);
+            setCurrentInstruction(instruction);
+
+            try {
+              const url = await textToSpeech(instruction);
+              setAudioUrl(url);
+              console.log("TTS completed for:", instruction);
+            } catch (err) {
+              console.error("TTS failed:", err);
+            }
+          }
         } else {
           alert("Directions failed: " + status);
         }
@@ -125,6 +143,9 @@ const MapComponent = () => {
           }}
         />
       </div>
+      {audioUrl && (
+        <audio src={audioUrl} autoPlay onEnded={() => setAudioUrl(null)} />
+      )}
     </LoadScript>
   );
 };
