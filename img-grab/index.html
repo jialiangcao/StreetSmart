@@ -1,0 +1,31 @@
+<!-- run file on a live server to test capture.js (make sure the stuff on the js file is uncommented) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Webcam Capture</title>
+  <style>
+    #video {
+      width: 300px;
+      border: 2px solid #333;
+    }
+    .photos {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .photos img {
+      width: 100px;
+      margin: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Live Frame Capture</h1>
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <div class="photos" id="photos"></div>
+  <script type="module" src="capture.js"></script>
+</body>
+</html>
