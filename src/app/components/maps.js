@@ -1,12 +1,12 @@
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+import { GoogleMap, LoadScript } from "@react-google-maps/api";
 
-// export default MapComponent;
-'use client';
-import React, { useEffect, useRef, useState } from 'react';
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
+const libraries = ["places"];
 
 const containerStyle = {
-  width: '70%',
-  height: '500px',
+  width: "70%",
+  height: "500px",
 };
 
 const defaultCenter = {
@@ -22,20 +22,22 @@ const MapComponent = () => {
   const directionsRendererRef = useRef(null);
   const directionsServiceRef = useRef(null);
   const panelRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   const [currentPosition, setCurrentPosition] = useState(null);
 
-  // Watch user's location
+  // Get and watch user's location
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         const newPosition = { lat: latitude, lng: longitude };
-        console.log('Current Position:', newPosition); // ✅ now it's defined
+        const timestamp = new Date(position.timestamp).toLocaleString(); 
+        console.log("Current Position:", newPosition, "at", timestamp);
         setCurrentPosition(newPosition);
       },
       (error) => {
-        console.error('Geolocation error:', error);
+        console.error("Geolocation error:", error);
       },
       {
         enableHighAccuracy: true,
@@ -43,24 +45,19 @@ const MapComponent = () => {
         timeout: 20000,
       }
     );
-  
+
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
-  
 
   const onLoad = (map) => {
     mapRef.current = map;
-
     directionsRendererRef.current = new window.google.maps.DirectionsRenderer();
     directionsRendererRef.current.setMap(map);
     directionsRendererRef.current.setPanel(panelRef.current);
-
     directionsServiceRef.current = new window.google.maps.DirectionsService();
-
     new window.google.maps.places.Autocomplete(endRef.current);
   };
 
-  // renders directions after submitted location
   const handleSearch = () => {
     const destination = endRef.current.value;
     if (!destination || !currentPosition) return;
@@ -72,36 +69,43 @@ const MapComponent = () => {
         travelMode: window.google.maps.TravelMode.WALKING,
       },
       (result, status) => {
-        if (status === 'OK') {
+        if (status === "OK") {
           directionsRendererRef.current.setDirections(result);
         } else {
-          alert('Directions failed: ' + status);
+          alert("Directions failed: " + status);
         }
       }
     );
   };
 
-  // Auto-recalculate route when position updates 
+  // Auto recalculate route when position updates
   useEffect(() => {
-    if (currentPosition) {
-      handleSearch();
+    if (!currentPosition) return;
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
+    timeoutRef.current = setTimeout(() => {
+      handleSearch();
+    }, 3000);
+
+    return () => clearTimeout(timeoutRef.current);
   }, [currentPosition]);
 
   return (
-    <LoadScript googleMapsApiKey={API_KEY} libraries={['places']}>
-      <div style={{ marginBottom: '10px' }}>
+    <LoadScript googleMapsApiKey={API_KEY} libraries={libraries}>
+      <div style={{ marginBottom: "10px" }}>
         <input
           ref={endRef}
           placeholder="Destination"
-          style={{ padding: '8px', width: '300px', marginRight: '10px' }}
+          style={{ padding: "8px", width: "300px", marginRight: "10px" }}
         />
-        <button onClick={handleSearch} style={{ padding: '8px' }}>
+        <button onClick={handleSearch} style={{ padding: "8px" }}>
           Set Destination
         </button>
       </div>
 
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: "flex" }}>
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={currentPosition || defaultCenter}
@@ -112,12 +116,12 @@ const MapComponent = () => {
         <div
           ref={panelRef}
           style={{
-            width: '700px',
-            height: '500px',
-            overflowY: 'auto',
-            padding: '10px',
-            background: 'white',
-            border: '1px solid #ccc',
+            width: "700px",
+            height: "500px",
+            overflowY: "auto",
+            padding: "10px",
+            background: "white",
+            border: "1px solid #ccc",
           }}
         />
       </div>
