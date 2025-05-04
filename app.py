@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+from flask_cors import CORS
 from ultralytics import YOLO
 import cv2
 import numpy as np
@@ -8,6 +9,7 @@ from elevenlabs.client import ElevenLabs
 from dotenv import load_dotenv
 
 app = Flask(__name__)
+CORS(app)
 trafficModel = YOLO("best.pt")
 carModel = YOLO("car-detection.pt")
 
