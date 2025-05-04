@@ -1,5 +1,5 @@
 // Replace this with actual deployment later
-let url = 'http://localhost:5000/'
+let url = 'https://sidewalkapi-278558760994.us-east4.run.app'
 // *** Might have to mess with CORS here or in app.py
 
 export async function predictTraffic(imageFile) {

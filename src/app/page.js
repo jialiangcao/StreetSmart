@@ -17,7 +17,9 @@ export default function Home() {
 
         const startCamera = async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } } });
+                //const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } } });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
                 videoRef.current.srcObject = stream;
 
                 // Start capturing frames every second
@@ -45,12 +47,12 @@ export default function Home() {
                 formData.append('image', blob, 'frame.jpg');
 
                 try {
-                    const trafficResponse = await fetch('http://127.0.0.1:5000/traffic', {
+                    const trafficResponse = await fetch('https://sidewalkapi-278558760994.us-east4.run.app/traffic', {
                         method: 'POST',
                         body: formData,
                     });
 
-                    const carResponse = await fetch('http://127.0.0.1:5000/car', {
+                    const carResponse = await fetch('https://sidewalkapi-278558760994.us-east4.run.app/car', {
                         method: 'POST',
                         body: formData,
                     })
