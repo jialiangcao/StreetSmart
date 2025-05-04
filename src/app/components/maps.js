@@ -47,8 +47,8 @@ const MapComponent = () => {
                 console.error("Geolocation error:", error);
             },
             {
-                enableHighAccuracy: true,
-                maximumAge: 0,
+                enableHighAccuracy: false,
+                maximumAge: 30000,
                 timeout: 20000,
             }
         );

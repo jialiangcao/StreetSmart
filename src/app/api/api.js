@@ -7,7 +7,7 @@ export async function predictTraffic(imageFile) {
     formData.append('image', imageFile)
 
     try {
-        const response = await fetch(url, {
+        const response = await fetch(url + "traffic", {
             method: 'POST',
             body: formData,
         })
@@ -30,7 +30,7 @@ export async function predictCar(imageFile) {
     formData.append('image', imageFile)
 
     try {
-        const response = await fetch(url, {
+        const response = await fetch(url + "car", {
             method: 'POST',
             body: formData,
         })

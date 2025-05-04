@@ -6,10 +6,12 @@ import numpy as np
 import os
 from elevenlabs.client import ElevenLabs
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 app = Flask(__name__)
 trafficModel = YOLO("best.pt")
 carModel = YOLO("car-detection.pt")
+CORS(app)
 
 load_dotenv()
 client = ElevenLabs(
@@ -47,6 +49,7 @@ def predictTraffic():
                 "bbox": [float(coord) for coord in box.xyxy[0]]
         }
         predictions.append(prediction)
+    print(jsonify({"trafficPrediction": predictions}))
 
     return jsonify({"trafficPrediction": predictions})
 
@@ -80,7 +83,7 @@ def predictCar():
         }
         predictions.append(prediction)
 
-    print(predictions)
+    # print(predictions)
     return jsonify({"carPrediction": predictions})
 
 # TTS is not tested
