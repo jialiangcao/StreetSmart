@@ -6,9 +6,13 @@ import { textToSpeech } from "../api/api";
 const libraries = ["places"];
 
 const containerStyle = {
-    width: "70%",
-    height: "500px",
+    width: "100%",
+    height: "25rem",
 };
+
+const mapOptions = {
+    disableDefaultUI: true,
+}
 
 const defaultCenter = {
     lat: 40.768742,
@@ -22,7 +26,6 @@ const MapComponent = () => {
     const mapRef = useRef(null);
     const directionsRendererRef = useRef(null);
     const directionsServiceRef = useRef(null);
-    const panelRef = useRef(null);
     const timeoutRef = useRef(null);
     const prevInstruction = useRef(null)
 
@@ -36,8 +39,8 @@ const MapComponent = () => {
             (position) => {
                 const { latitude, longitude } = position.coords;
                 const newPosition = { lat: latitude, lng: longitude };
-                const timestamp = new Date(position.timestamp).toLocaleString();
-                console.log("Current Position:", newPosition, "at", timestamp);
+                // const timestamp = new Date(position.timestamp).toLocaleString();
+                // console.log("Current Position:", newPosition, "at", timestamp);
                 setCurrentPosition(newPosition);
             },
             (error) => {
@@ -57,7 +60,6 @@ const MapComponent = () => {
         mapRef.current = map;
         directionsRendererRef.current = new window.google.maps.DirectionsRenderer();
         directionsRendererRef.current.setMap(map);
-        directionsRendererRef.current.setPanel(panelRef.current);
         directionsServiceRef.current = new window.google.maps.DirectionsService();
         new window.google.maps.places.Autocomplete(endRef.current);
     };
@@ -82,7 +84,7 @@ const MapComponent = () => {
                         setCurrentInstruction(instruction);
                     }
                 } else {
-                    alert("Directions failed: " + status);
+                    console.log("Directions failed: " + status);
                 }
             }
         );
@@ -106,6 +108,8 @@ const MapComponent = () => {
 
     // Auto recalculate route when position updates
     useEffect(() => {
+        if (!endRef.current || !currentPosition) return;
+
         if (!currentPosition) return;
 
         if (timeoutRef.current) {
@@ -120,40 +124,31 @@ const MapComponent = () => {
 
     return (
         <LoadScript googleMapsApiKey={API_KEY} libraries={libraries}>
-            <div>
-                <input
-                    ref={endRef}
-                    placeholder="Destination"
-                    style={{ padding: "8px", width: "300px", marginRight: "10px" }}
-                />
-                <button onClick={handleSearch} style={{ padding: "8px" }}>
-                    Set Destination
-                </button>
-            </div>
 
-            <div style={{ display: "flex" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "100%" }}>
+                    <input
+                        ref={endRef}
+                        placeholder="Destination"
+                        style={{ padding: "8px", width: "70%", background: "white", color: "black", border: "none" }}
+                    />
+                    <button onClick={handleSearch} style={{ width: "30%", height: "auto", padding: "8px", background: "rgba(3, 161, 252)", color: "white", border: "none" }}>
+                        Search
+                    </button>
+                </div>
                 <GoogleMap
                     mapContainerStyle={containerStyle}
                     center={currentPosition || defaultCenter}
                     zoom={14}
                     onLoad={onLoad}
-                    options={{ disableDefaultUI: true }}
-                />
-                <div
-                    ref={panelRef}
-                    style={{
-                        width: "700px",
-                        height: "500px",
-                        overflowY: "auto",
-                        padding: "10px",
-                        background: "white",
-                        border: "1px solid #ccc",
-                    }}
+                    options={mapOptions}
                 />
             </div>
+
             {audioUrl && (
                 <audio src={audioUrl} autoPlay onEnded={() => setAudioUrl(null)} />
             )}
+
         </LoadScript>
     );
 };
