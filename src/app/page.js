@@ -4,6 +4,7 @@ import { useState, useEffect, useRef} from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Camera, Video, VideoOff } from "lucide-react"
+import MapComponent from "./components/maps";
 
 export default function CameraDetection() {
 	const [isRecording, setIsRecording] = useState(false)
@@ -97,6 +98,8 @@ export default function CameraDetection() {
 				</CardContent>
 			</Card>
 
+			<MapComponent/>
+
 			<div className="flex justify-center items-center">
 				<Button
 					onClick={() => setIsRecording(true)}
@@ -140,4 +143,3 @@ export default function CameraDetection() {
 		</div>
 	)
 }
-
