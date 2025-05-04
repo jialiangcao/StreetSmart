@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import Image from "next/image";
 import styles from "./page.module.css";
 import MapComponent from "./components/maps";
+import { FaHome } from 'react-icons/fa';
 
 export default function Home() {
     const videoRef = useRef(null)
@@ -118,33 +119,132 @@ export default function Home() {
 
     }, [trafficPrediction])
 
+    const buttonStyle = {
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '50%',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.15)',
+    };
+
     return (
-        <div className="flex flex-col h-screen bg-gray-100">
-            {/* Notification - appears at top when active */}
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', backgroundColor: 'white' }}>
+            <div style={{
+                backgroundColor: 'white',
+                padding: '.55rem',
+                display: 'flex',
+                alignItems: 'center', // Vertically align items
+                color: 'black',
+            }}>
+                {/* Home Button on the Left */}
+                <button
+                    onClick={() => window.location.href = '/'}
+                    style={buttonStyle}
+                    aria-label="Go to Home"
+                >
+                    <FaHome size={30} color="black" />
+                </button>
+
+                {/* Text Horizontally Centered */}
+                <h2 style={{ textAlign: 'center', margin: 0, flexGrow: .9 }}>Street Smart</h2>
+            </div>
             {notification && (
-                <div className="fixed top-0 left-0 right-0 mx-auto w-full max-w-md bg-red-500 text-white px-4 py-3 rounded-b-md shadow-lg z-50 text-center animate-fade-in-down">
-                    <p className="text-sm font-medium">{notification}</p>
+                <div style={{
+                    position: 'fixed',
+                    top: 18,
+                    left: 0,
+                    right: 0,
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    width: '100%',
+                    maxWidth: '28rem',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '0.75rem',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    zIndex: 50,
+                    textAlign: 'center',
+                    animation: 'fade-in-down 0.5s ease-out'
+                }}>
+                    <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{notification}</p>
                 </div>
             )}
 
-            {/* Webcam Section - Top Half */}
-            <div className="relative h-1/2 bg-black overflow-hidden">
-                <main className="absolute inset-0 flex items-center justify-center">
+            <div style={{ position: 'relative', height: '50%', overflow: 'hidden' }}>
+                <main style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
                     <video
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        className="object-cover w-full h-full"
+                        style={{ paddingLeft: '.5rem', paddingRight: '.5rem', borderRadius: '1.5rem', objectFit: 'cover', width: '100%', height: '100%' }}
                     />
-                    <canvas
-                        ref={canvasRef}
-                        style={{ display: 'none' }}
-                    />
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+                    <div style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        left: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: '1rem',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem'
+                    }}>
+                        <div style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: 'red',
+                            animation: 'blink 3s infinite'
+                        }}></div>
+                        <span> Keep the camera centered</span>
+                    </div>
                 </main>
             </div>
+            <style>
+                {`
+                @keyframes blink {
+                    0%, 50%, 100% { opacity: 1; }
+                    25%, 75% { opacity: 0; }
+                }
+                @keyframes fade-in-down {
+                  0% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                  }
+                  100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                }
+            `}
+            </style>
 
-            {/* Map Section - Bottom Half */}
-            <div className="h-1/2 bg-white rounded-t-3xl shadow-lg overflow-hidden">
+            <div style={{
+                height: '60%',
+                backgroundColor: 'white',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                overflow: 'hidden',
+                paddingLeft: '0.5rem',
+                paddingRight: '0.5rem'
+            }}>
                 <MapComponent />
             </div>
         </div>

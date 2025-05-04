@@ -8,6 +8,7 @@ const libraries = ["places"];
 const containerStyle = {
     width: "100%",
     height: "25rem",
+    borderRadius: ".75rem"
 };
 
 const mapOptions = {
@@ -126,13 +127,13 @@ const MapComponent = () => {
         <LoadScript googleMapsApiKey={API_KEY} libraries={libraries}>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: "100%" }}>
+                <div style={{ width: "95%", transform: 'translateY(50px)', zIndex: '50', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', }}>
                     <input
                         ref={endRef}
                         placeholder="Destination"
-                        style={{ padding: "8px", width: "70%", background: "white", color: "black", border: "none" }}
+                        style={{ padding: "12px", width: "70%", background: "white", color: "black", border: "none", borderTopLeftRadius: ".75rem", borderBottomLeftRadius: ".75rem", boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', }}
                     />
-                    <button onClick={handleSearch} style={{ width: "30%", height: "auto", padding: "8px", background: "rgba(3, 161, 252)", color: "white", border: "none" }}>
+                    <button onClick={handleSearch} style={{ width: "30%", height: "auto", padding: "12px", background: "rgba(3, 161, 252)", color: "white", border: "none", borderTopRightRadius: '.75rem', borderBottomRightRadius: '.75rem', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', }}>
                         Search
                     </button>
                 </div>
